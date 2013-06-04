@@ -1,108 +1,86 @@
 function shaman_elemental(self)
-  -- Updated for MoP
-  -- Tier 1: Astral Shift
-  -- Tier 2: Windwalk Totem
-  -- Tier 3: Call of the Elements
-  -- Tier 4: Echo of the Elements
-  -- Tier 5: Healing Tide Totem
-  -- Major Glyphs: Flame Shock (required), Spiritwalker's Grace (recommended),
-  --    Telluric Currents (recommended)
-  -- Minor Glyphs: Thunderstorm (required)
+   -- Updated for MoP
+   -- Tier 1: Astral Shift
+   -- Tier 2: Windwalk Totem
+   -- Tier 3: Call of the Elements
+   -- Tier 4: Echo of the Elements
+   -- Tier 5: Healing Tide Totem
+   -- Major Glyphs: Flame Shock (required), Spiritwalker's Grace (recommended),
+   --    Telluric Currents (recommended)
+   -- Minor Glyphs: Thunderstorm (required)
+   if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then return end
 
-  local lsStacks = jps.buffStacks("lightning shield")
-  local focus = "focus"
-  local me = "player"
-  local mh, _, _, oh, _, _, _, _, _ =GetWeaponEnchantInfo()
-  local engineering ="/use 10"
-  local r = RunMacroText
+   local playerHealth = UnitHealth("player")/UnitHealthMax("player") *100
+   local playerMana = UnitMana("player")/UnitManaMax("player") * 100
+   local spell = nil
+   local lsStacks = jps.buffStacks("lightning shield")
+   local mh, _, _, oh, _, _, _, _, _ =GetWeaponEnchantInfo()
 
-  -- Totems
-  local _, fireTotem, _, _, _ = GetTotemInfo(1)
-  local _, earthTotem, _, _, _ = GetTotemInfo(2)
-  local _, waterName, _, _, _ = GetTotemInfo(3)
-  local _, airTotem, _, _, _ = GetTotemInfo(4)
+   -- Totems
+   local _, fireName, _, _, _ = GetTotemInfo(1)
+   local _, earthName, _, _, _ = GetTotemInfo(2)
+   local _, waterName, _, _, _ = GetTotemInfo(3)
+   local _, airName, _, _, _ = GetTotemInfo(4)
 
-  local fireTotemActive = fireTotem ~= ""
-  local earthTotemActive = earthTotem ~= ""
-  local waterTotemActive = waterName ~= ""
-  local airTotemActive = airTotem ~= ""
+   local haveFireTotem = fireName ~= ""
+   local haveEarthTotem = earthName ~= ""
+   local haveWaterTotem = waterName ~= ""
+   local haveAirTotem = airName ~= ""
 
-  -- Fear
-  local feared = jps.debuff("Fear") or jps.debuff("Intimidating Shout") or jps.debuff("Howl of Terror") or jps.debuff("Psychic Scream")
+   -- Miscellaneous
+   local feared = jps.debuff("fear","player") or jps.debuff("intimidating shout","player") or jps.debuff("howl of terror","player") or jps.debuff("psychic scream","player")
+
+   if UnitThreatSituation("player") == 3 and cd("Astral Shift") == 0 and GetNumSubgroupMembers() > 0 then
+      spell = "Astral Shift"
+
+   else
+
+   local spellTable = 
+   {
+      --Get some buffs
+      { "lightning shield",         not jps.buff("lightning shield") },
+      { "Flametongue Weapon",       not mh},
+      { "Healing Surge",            playerHealth < 40 },
+      
+      --Totems
+      { "searing totem",            not haveFireTotem },
+      { "fire elemental totem",     jps.UseCDs },
+      { "earth elemental totem",    jps.UseCDs and jps.bloodlusting() },
+      { "stormlash totem",          jps.UseCDs and jps.bloodlusting() },
+      
+      --Use some CDs to burst
+      { "ascendance",               jps.UseCDs and not jps.buff("ascendance")},
+      { jps.DPSRacial,              jps.UseCDs },
+      { {"macro","/use 10"},        jps.glovesCooldown() == 0 and jps.UseCDs },
+
+      --Interrupts
+      { "Wind Shear",               jps.shouldKick("target") and jps.Interrupts and (jps.castTimeLeft("target") <= 0.5) , "target"  },
+      
+      --Damage
+      { "Earthquake",               jps.MultiTarget and IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
+      { "Totemic Projection",       IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
+      
+      --{ "Unleash Elements",         jps.debuffDuration("flame shock") < 2 },
+      { "Lava Burst",               jps.debuff("flame shock") and jps.debuffDuration("flame shock") > 1.5 },
+      { "Flame Shock",              (not jps.debuff("flame shock") or jps.debuffDuration("flame shock") < 2 ) },
+      { "Elemental Blast",          },
+
+      { "Earth shock",              lsStacks > 5 and jps.debuffDuration("Flame Shock") > 4.5 },
+      
+      { "spiritwalker's grace",     jps.Moving },
+      { "Unleach Elements",         jps.Moving },
+      
+      { "Lava Beam",                jps.MultiTarget and jps.buff("ascendance") },
+      { "chain lightning",          jps.MultiTarget },
+      { "thunderstorm",             jps.mana() < .6 and jps.UseCDs },
+      { "lightning bolt",           },
+      
+      { {"macro","/startattack"}, nil, "target" },
+   }
+
+   local spell,target = parseSpellTable(spellTable)
+   return parseSpellTable(spellTable)
+   end
    
-  local possibleSpells = {
-    
-    { "Lightning Shield",
-      not jps.buff("Lightning Shield") },
-    
-    { "Flametongue Weapon",
-      not mh },
-
-    { "Astral Shift", 
-     jps.hp() < .35 },
-     
-    { "Healing Tide Totem", 
-      jps.hp() < .5 },
-    
-    { "Healing Surge", 
-      jps.hp() < .7 },
-    
-    { "Fire Elemental Totem",
-       jps.UseCDs },
-
-    { "Searing Totem",
-       not fireTotemActive },
-    
-    { "Earth Elemental Totem",
-       jps.UseCDs and jps.bloodlusting() },
-
-    { "Stormlash Totem",
-       jps.UseCDs and jps.bloodlusting() },
-
-    -- Trinket CDs.
-    { jps.useSlot(13), 
-      jps.UseCDs },
-    { jps.useSlot(14), 
-      jps.UseCDs },
-    
-    -- Synapse Springs CD. (engineering gloves)
-    { jps.useSlot(10), 
-      jps.UseCDs },
-      
-    -- Lifeblood CD. (herbalists)
-    { "Lifeblood",
-      jps.UseCDs },
-    
-    -- DPS Racial CD.
-    { jps.DPSRacial, 
-      jps.UseCDs },
-      
-    { "Wind Shear",
-       jps.shouldKick() },
-
-    { "Unleash Elements",
-       jps.debuffDuration("Flame Shock") < 2 },
-      
-    { "Flame Shock",
-       jps.buff("Unleash Flame") },
-
-    { "Lava Burst",
-       jps.debuff("Flame Shock") },
-
-    { "Earth Shock",
-       lsStacks > 5 and jps.debuffDuration("Flame Shock") > 5 },
-      
-    { "Spiritwalker's Grace",
-       jps.Moving },
-      
-    { "Chain Lightning",
-       jps.MultiTarget },
-      
-    { "Thunderstorm",
-       jps.mana() < .6 and jps.UseCDs },
-      
-    { "Lightning Bolt" },
-  }
-
-  return parseSpellTable(possibleSpells)
+   return spell
 end

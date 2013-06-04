@@ -26,7 +26,7 @@ function jps_createConfigFrame()
 	local h = 128
 
 	-- More Juked <3
-	jpsConfigFrame.name = "JPS Options Panel"
+	jpsConfigFrame.name = "Updates Options Panel"
 	local title = jpsConfigFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", 20, -10) 
 	title:SetText("JPS")
@@ -37,14 +37,14 @@ function jps_createConfigFrame()
 	subtitle:SetNonSpaceWrap(true)
 	subtitle:SetJustifyH("LEFT")
 	subtitle:SetJustifyV("TOP")
-	subtitle:SetText("Configuration options for JPS")
+	subtitle:SetText("Configuration options for Updates")
 
 	-- <3 to Juked
 	-- Create checkboxes
 	local buttonPositionY = -60;
 	local buttonPositionX = 40;
 	
-	local t = {1,2,3,4,5,6,7,8}
+	local t = {1,2,3,4,5,6,7,8,9}
 	for var,value in pairs(jpsDB[jpsRealm][jpsName]) do
 		if type(jpsDB[jpsRealm][jpsName][var]) == "boolean" then
 			if var == "Enabled" then t[1] = var
@@ -55,6 +55,7 @@ function jps_createConfigFrame()
 			elseif var == "UseCDs" then t[6] = var
 			elseif var == "MultiTarget" then t[7] = var
 			elseif var == "ExtraButtons" then t[8] = var
+			elseif var == "Defensive" then t[9] = var
 			else table.insert(t,var)
 			end
 		end

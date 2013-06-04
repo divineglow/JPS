@@ -34,6 +34,7 @@ function jps_VARIABLES_LOADED()
 		jpsDB[jpsRealm][jpsName].UseCDs = false
 		jpsDB[jpsRealm][jpsName].PvP = false
 		jpsDB[jpsRealm][jpsName].MultiTarget = false
+		jpsDB[jpsRealm][jpsName].Defensive = false
 		jpsDB[jpsRealm][jpsName].ExtraButtons = false
 		jpsDB[jpsRealm][jpsName].spellConfig = {}
 		jpsDB[jpsRealm][jpsName].useRotation = 1
@@ -62,10 +63,11 @@ function jps_LOAD_PROFILE()
 	jps.gui_toggleCDs( jps.UseCDs )
 	jps.gui_toggleMulti( jps.MultiTarget )
 	jps.gui_toggleInt(jps.Interrupts)
+	jps.gui_toggleDef(jps.Defensive)
 	jps.gui_toggleToggles( jps.ExtraButtons )
 	jps.gui_setToggleDir( "right" )
 	jps.togglePvP( jps.PvP )
-	jps.resize( 36 )
+	jps.resize( 30 )
 end
 
 -- SAVE_PROFILE
@@ -110,7 +112,7 @@ function jps_getCombatFunction( class, spec )
 		["Priest"]       = { ["Shadow"]        = priest_shadow,
 							 ["Holy"]          = priest_holy,
 							 ["Discipline"]    = priest_disc },
-		["Monk"]       = { ["Brewmaster"]        = monk_brewmaster,
+		["Monk"]       	 = { ["Brewmaster"]    = monk_brewmaster,
 							 ["Windwalker"]    = monk_windwalker,
 							 ["Mistweaver"]    = monk_mistweaver },
 	}

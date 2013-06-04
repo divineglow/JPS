@@ -1,104 +1,91 @@
 function paladin_protadin(self)
-  
-  local holyPower = jps.holyPower()
-  
-  local possibleSpells = {
-    
-    -- Interrupt
-    { "Rebuke",
-      jps.shouldKick() },
-    
-    -- Interrupt    
-    { "Avenger's Shield",
-      jps.shouldKick() 
-      and jps.UseCDs 
-      and IsSpellInRange("Avenger's Shield","target") == 0 
-      and jps.LastCast ~= "Rebuke" },
-
-    -- Stun
-    { "Hammer of Justice",
-      jps.shouldKick() },
-    
-    -- Stun
-    { "Fist of Justice",
-      jps.shouldKick() },
-    
-    -- Aggro
-    { "Holy Avenger",
-      jps.UseCDs },
-    
-    -- Aggro
-    { "Avenging Wrath",
-      jps.UseCDs },
-        
-    -- Oh shit button
-    { "Lay on Hands",
-      jps.hp() < 0.3 
-      and jps.UseCDs },
-    
-    -- Mitigation
-    { "Ardent Defender",
-      jps.hp() < 0.5 
-      and jps.UseCDs },
-    
-    -- Mitigation
-    { "Divine Protection",
-      jps.hp() < 0.8 
-      and jps.UseCDs },
-        
-    -- Heal
-    { {"macro","/cast Word of Glory"},
-      jps.hp() < 0.7 and holyPower > 2 },
-    
-    -- Heal
-    { "Hand of Purity",
-      jps.hp() < .6
-      and jps.UseCDs, "player" },
-    
-    -- Heal
-    { "Holy Prism",
-      jps.hp() < .6 
-      and jps.UseCDs, "player" },
-    
-    -- Buff
-    { "Righteous Fury",
-      not jps.buff("Righteous Fury") },
-    
-    -- Buff
-    { "Sacred Shield",
-      not jps.buff("Sacred shield") },
-    
-    -- Execute
-    { "Hammer of Wrath",
-      jps.hp("target") <= .2 }, 
-        
-    -- Damage
-    { "Avenger's Shield" },
-    
-    -- Damage (Multi target or missing debuff)
-    { "Hammer of the Righteous",
-      not jps.debuff("Weakened Blows")
-      or jps.MultiTarget }, 
-    
-    -- Damage
-    { "Shield of the Righteous",
-      holyPower > 3 },
-    
-    -- Damage
-    { "Judgment" },      
-    
-    -- Damage (Single target)
-    { "Crusader Strike",
-       not jps.MultiTarget },
-    
-    -- Damage
-    { "Consecration" },
-    
-    -- Damage
-    { "Holy Wrath" },   
-  }
+   --Gocargo
    
-   local spell, target = parseSpellTable(possibleSpells)
-	jps.Target = target
-	return spell
+   if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then return end
+
+   local myHealthPercent = UnitHealth("player")/UnitHealthMax("player") * 100
+   local targetHealthPercent = UnitHealth("target")/UnitHealthMax("target") * 100
+   local myManaPercent = UnitMana("player")/UnitManaMax("player") * 100
+   local hPower = UnitPower("player","9")
+   local stacks = jps.debuffStacks("Censure","target")
+   local spell = nil
+   local nStance = GetShapeshiftForm(nil);
+   local Acharge = jps.buffStacks("Bastion of Glory")
+   local targetdistance = CheckInteractDistance("target", 3)
+   local mythreat = UnitThreatSituation("player", "target")  
+
+    spellTable =
+   {    
+      -- Check for Which Seal to use
+       { "Seal of Truth",          	       not jps.MultiTarget and   nStance ~= 1 and stacks < 5 }, 
+      --{ "Seal of Insight",                not jps.MultiTarget and jps.Defensive and nStance ~= 3 },
+       { "Seal of Righteousness",          jps.MultiTarget  and nStance ~= 2 }, 
+       { "Seal of Insight",                nStance ~= 3 and stacks == 5	and not jps.MultiTarget						 },
+       { "Word of Glory", 				   IsAltKeyDown() ~= nil }, 
+      -- { "Cleanse", 					  jps.Defensive },
+       { "Shield of the Righteous",				 IsShiftKeyDown() ~= nil   },
+       { "Cleanse", 						    IsControlKeyDown() ~= nil },
+       
+             -- Kicks
+      { "Rebuke",                         jps.shouldKick() },
+      { "Rebuke",                         jps.shouldKick("focus"), "focus" },
+      { "Arcane Torrent",                 jps.shouldKick() and IsSpellInRange("Crusader Strike","target")==1 and jps.LastCast ~= "Rebuke" },
+      { "Avenger's Shield",               jps.shouldKick() and ((jps.LastCast ~= "Rebuke") or (jps.LastCast ~= "Arcane Torrent")) },
+      { "Hammer of Wrath",                },
+       
+       { "Hammer of the Righteous",       not jps.debuff("Weakened Blows", "target") or jps.MultiTarget }, 
+       { "Crusader Strike",                },
+       { "Avenger's Shield",               jps.buff("Grand Crusader") },
+        { "Judgment",                       },
+         { "Avenger's Shield",             not jps.Interrupts  },   
+       
+      -- Defensive Cooldowns
+     -- { "Lay on Hands",                   myHealthPercent < 10  }, --10 Minute CD
+      --{ "Guardian of Ancient Kings",      myHealthPercent < 25  }, --3 Minute CD
+      { "Ardent Defender",                myHealthPercent < 15  }, --3 Minute CD
+     -- { "Seal of Insight",                (myHealthPercent < 50 or myManaPercent < 40 ) and nStance ~= 3 },
+      { "Divine Protection",              myHealthPercent < 60  }, --1 Minute CD
+
+      --Active Mitgations
+      --{ "Word of Glory",                  myHealthPercent < 75 and jps.buff("Shield of the Righteous") },
+      --{ "Word of Glory",                  myHealthPercent < 40 and Acharge >= 4  },
+      
+     
+
+
+      
+      -- Basic Setup Stuff
+      { "Righteous Fury",                 not jps.buff("Righteous Fury") },
+     
+     
+      { "Shield of the Righteous",         hPower >= 5 },
+      { "Sacred Shield",                   jps.Defensive				 },
+      { "Hand of Purity",                  jps.Defensive			   	 },
+       { "Holy Avenger",                   jps.Defensive and jps.UseCDs				 },
+      --{ "Light's Hammer",                 IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
+      
+      -- CDs
+     
+     -- { "Avenging Wrath",                 jps.UseCDs },
+      { jps.useTrinket(1),      		  jps.UseCDs },
+      { jps.useTrinket(2),       		  jps.UseCDs },
+      { "Execution Sentence",             jps.UseCDs },    
+      -- Damage
+     
+     
+      { "Consecration",                    IsSpellInRange("Crusader Strike","target")==1 }, 
+      
+     
+        
+      
+      
+     
+      { "Holy Wrath",                     },
+
+      { {"macro","/startattack"}, nil, "target" },
+   }
+
+   local spell,target = parseSpellTable(spellTable)
+   jps.Target = target
+   return spell
 end

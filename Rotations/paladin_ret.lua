@@ -1,105 +1,70 @@
 function paladin_ret(self)
+   -- Jokur
 
-  local holyPower = UnitPower("player", "9")
+   if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then return end
 
-  local spellTable = {  
-    
-    -- Might
-    { "Blessing of Might", 
-      not jps.buff("Blessing of Might") },
-    
-    -- Oh shit button
-    { "Lay on Hands", 
-      jps.UseCDs
-      and jps.hp() < .2 },
-    
-    -- Bubble
-    { "Divine Shield", 
-      jps.UseCDs
-      and jps.hp() < .2 },
-    
-    -- Big Heal
-    { "Flash of Light", 
-      jps.hp() < .75
-      and jps.buff("The Art of War") },
-    
-    -- Heal
-    { "Sacred Shield", 
-      jps.hp() < .7
-      and not jps.buff("Sacred Shield") },
-    
-    -- Guardian of Ancient Kings
-    { "Guardian of Ancient Kings", 
-      jps.UseCDs },
-    
-    -- Avenging Wrath
-    { "Avenging Wrath", 
-      jps.UseCDs
-      and jps.hp() < .8 },
-    
-    -- Holy Avenger
-    { "Holy Avenger", 
-      jps.UseCDs
-      and jps.hp() < .7 },
-            
-    -- Heal
-    { "Word of Glory", 
-      jps.hp() < .7 },
-    
-    -- Interrupts
-    { "Rebuke", 
-      jps.Interrupts 
-      and jps.shouldKick() },
-    
-    -- Trinket CDs.
-    { jps.useSlot(13), 
-      jps.UseCDs },
-    { jps.useSlot(14), 
-      jps.UseCDs },
-    
-   	-- Engineers may have synapse springs on their gloves (slot 10).
-		{ jps.useSynapseSprings(), 
-      jps.UseCDs },
-    
-    -- Lifeblood CD. (herbalists)
-    { "Lifeblood",
-      jps.UseCDs },
-    
-    -- DPS Racial CD.
-    { jps.DPSRacial, 
-      jps.UseCDs },
-    
-    -- Buff
-    { "Inquisition", 
-      jps.buffDuration("Inquisition") < 5 
-      and (
-        holyPower > 2 
-        or jps.buff("Divine Purpose")
-      ) },
-    
-    -- Damage
-    { "Templar's Verdict", 
-      holyPower == 5 },
-    
-    -- Execute
-    { "Hammer of Wrath", 
-      jps.buff("Avenging Wrath") 
-      or jps.hp("target") <= .2 },
+   local spell = nil
+   local targetHealth = UnitHealth("target")/UnitHealthMax("target") *100
+   local hPower = UnitPower("player","9")
+   local myHealthPercent = UnitHealth("player")/UnitHealthMax("player") * 100
+   local nStance = GetShapeshiftForm(nil);
 
-    -- Exorcism proc
-    { "Exorcism", 
-      jps.buff("The Art of War") },
-    
-    -- Damage
-    { "Judgment" },
-    
-    -- Damage
-    { "Crusader Strike" },
-    
-    -- Damage
-    { "Exorcism" },
-  }
+   local spellTable =
+   {      
    
+    -- Lets Check our Seal's
+    { "Seal of Truth",              not jps.MultiTarget and nStance ~= 1 },
+    { "Seal of Righteousness",      jps.MultiTarget and nStance ~= 2 },
+    
+    -- Health Check for LoH and Sacred Shield
+    { "Lay on Hands",               myHealthPercent < 15 },
+    { "Sacred Shield", 			    myHealthPercent < 95 and not jps.buff("Sacred Shield") },
+    
+    -- Interupt Checker
+    { "Rebuke",                     jps.Interrupts and jps.shouldKick() and (jps.castTimeLeft("target") <= 1) },
+    { "Rebuke",                     jps.Interrupts and  (jps.castTimeLeft("target") <= 1) and jps.shouldKick("focus"), "focus" },
+    { "Arcane Torrent",             jps.Interrupts and jps.shouldKick() and (jps.castTimeLeft("target") <= 1) and IsSpellInRange("Crusader Strike","target")==1 and jps.LastCast ~= "Rebuke" },
+    
+     
+   	-- Blow our CD's to get things Started	
+   	{ "Avenging Wrath",             jps.UseCDs },
+    { "Guardian of Ancient Kings",  jps.UseCDs },
+    { jps.useTrinket(1),        	jps.UseCDs },
+    { jps.useTrinket(2),        	jps.UseCDs },
+    { jps.DPSRacial,            	jps.UseCDs },
+    
+    -- Check for Keys Being Pressed
+    -- { "Light's Hammer",         	IsLeftShiftKeyDown() ~= nil },
+    
+    -- Hard Hitting Items to Check First 
+    { "Templar's Verdict",      	hPower == 5 and not jps.MultiTarget },
+    { "Divine Storm",      			hPower >= 3 and jps.MultiTarget },   
+    { "Exorcism",               	jps.buff("The Art of War") },
+    { "Execution Sentence",         jps.buff("Inquisition") },
+    { "Hammer of Wrath",        	targetHealth < 20 or jps.buff("Avenging Wrath") },
+    
+    -- DPS Rotation
+   	{ "inquisition",            	not jps.buff("Inquisition") or jps.buffDuration("inquisition") < 2 },
+   	{ "Exorcism",               	},
+   	{ "crusader strike", 			not jps.MultiTarget },
+   	{ "Hammer of the Righteous",    jps.MultiTarget },
+   	{ "judgment",                   },
+   	{ "Templar's Verdict",      	hPower == 3 and not jps.MultiTarget },
+   	{ "Divine Storm",      			hPower == 3 and jps.MultiTarget }, 
+   	
+   	-- End DPS Rotation
+ 
+    { {"macro","/startattack"}, nil, "target" },
+   }
 
-   return parseSpellTable(spellTable)
+   local spell,target = parseSpellTable(spellTable)
+    if spell == "Light's Hammer" then
+   jps.Cast( spell )
+   jps.groundClick()
+ end
+   
+   jps.Target = target
+   return spell
 end
+
+

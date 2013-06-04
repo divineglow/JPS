@@ -20,8 +20,7 @@
 
 -- canCast
 function ImReallySureICanCastThisShit( spell, unit )
-  if spell == nil then return false end
-	spell = spell:lower()
+	spell:lower()
 
 	--debug mode
 	if jps.Debug then return jpd( spell, unit ) end
@@ -49,12 +48,12 @@ end
 
 -- spell Config Methods
 function setSpellStatus(spell, status)
-    spell = spell:lower()
+    spell:lower()
     jps.spellConfig[spell] = status
 end
 
 function getSpellStatus(spell)
-    spell = spell:lower()
+    spell:lower()
     local spellConfig = jps.spellConfig[spell]
     if(spellConfig == nil) then
        setSpellStatus(spell, 1)

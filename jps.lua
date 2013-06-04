@@ -99,7 +99,7 @@ combatFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 function write(...)
 	if jps.BlankCheck then return end
-	DEFAULT_CHAT_FRAME:AddMessage("|cffff8000JPS: " .. strjoin(" ", tostringall(...)));
+	DEFAULT_CHAT_FRAME:AddMessage("|cffff8000Updates: " .. strjoin(" ", tostringall(...)));
 end
 
 function combatEventHandler(self, event, ...)
@@ -266,6 +266,8 @@ function SlashCmdList.jps(cmd, editbox)
 		jps.gui_toggleCDs()
 	elseif msg == "int" or msg == "interrupts" then
 		jps.gui_toggleInt()
+	elseif msg == "def" or msg == "defensive" then
+		jps.gui_toggleDef()
 	elseif msg == "pint" then
 		jps.PVPInterrupt = not jps.PVPInterrupt
 		write("PVP Interrupt use set to",tostring(jps.PVPInterrupt))
@@ -282,9 +284,6 @@ function SlashCmdList.jps(cmd, editbox)
 		write("Opening flag is now set to",tostring(jps.Opening))
 	elseif msg == "size" then
 		jps.resize( rest )
-	elseif msg == "def" or msg == "defensive" then
-		jps.Defensive = not jps.Defensive
-		write("Defensive cooldown usage set to", tostring(jps.Defensive))
 	elseif msg == "heal" then
 		jps.Healing = not jps.Healing
 		write("Healing set to", tostring(jps.Healing))
@@ -327,23 +326,23 @@ end
 
 -- get spell from UseAction
 hooksecurefunc("UseAction", function(...)
-	if jps.Enabled and select(3, ...) ~= nil then
-		local stype, id = GetActionInfo( select(1, ...) )
-		if stype == "spell" then
-			local name,_,_,_,_,_,_,_,_ = GetSpellInfo(id)
-			if jps.NextCast ~= name and not jps.shouldSpellBeIgnored(name) then 
-				jps.NextCast = name
-				-- if jps.Combat then write("Set", name, "for next cast.") end
-			end
-		end
-	end
+if jps.Enabled and (select(3, ...) ~= nil) and (InCombatLockdown()==1) then
+   local stype,id,_ = GetActionInfo( select(1, ...) )
+   if stype == "spell" then
+      local name = select(1,GetSpellInfo(id))
+      if jps.NextSpell[#jps.NextSpell] ~= name then -- # valable que pour table ipairs table[1]
+         table.insert(jps.NextSpell, name)
+         if jps.Combat then write("Set",name,"for next cast.") end
+      end
+   end
+end
 end)
 
 function combat(self) 
 	-- Check for the Rotation
 	if not jps.Class then return end
 	if not jps.Rotation then
-		write("Sorry! The rotation file for your",jps.Spec,jps.Class.." seems to be corrupted. Please send Jp (iLulz) a bug report, and make sure you have \"Display LUA Errors\" enabled, you'll find this option by going to the WoW Interface Menu (by pressing Escape) and going to Help -> Display LUA Errors. Thank you!")
+		write("Sorry! The rotation file for your",jps.Spec,jps.Class.." seems to be corrupted.")
 		jps.Enabled = false
 		return
 	end
@@ -358,35 +357,26 @@ function combat(self)
 	-- Movement
 	jps.Moving = select(1,GetUnitSpeed("player")) > 0
 
-	-- Casting (Modified for Mistweaver so that we can still cast while channeling)
-	if UnitCastingInfo("player") or (UnitChannelInfo("player") and jps.Spec ~= "Mistweaver") then
-    jps.Casting = true
-	else
-    jps.Casting = false
+	-- Casting
+	if UnitCastingInfo("player") or UnitChannelInfo("player") then jps.Casting = true
+	else jps.Casting = false
 	end
 	
 	-- Table RaidStatus
 	if jps.Healing then jps.SortRaidStatus() end
 	
+	-- Get spell from rotation
+	jps.ThisCast = jps.Rotation()
+
 	-- Check spell usability
-	if jps.NextCast ~= nil then
-		if not jps.Casting then
-				if jps.Cast(jps.NextCast) ~= false then
-					jps.NextCast = nil
-				else
-					if (jps.cooldownNoLag(jps.NextCast) > 1.5) then
-						jps.NextCast = nil
-					end
-				end
+	if jps.ThisCast ~= nil and not jps.Casting then
+		if jps.NextCast ~= nil and jps.NextCast ~= jps.ThisCast then
+				jps.Cast(jps.NextCast)
+				jps.NextCast = nil
+        	else
+            	jps.Cast(jps.ThisCast)
 		end
-	else
-		-- Get spell from rotation
-		jps.ThisCast = jps.Rotation()
-	
-		if jps.ThisCast ~= nil and not jps.Casting then
-			jps.Cast(jps.ThisCast)
-		end
-	end
+   	end
 	
 	-- Hide Error
 	StaticPopup1:Hide()
