@@ -21,9 +21,9 @@ function priest_shadow(self)
 		{ "mind blast",					},
 		{ "shadow word: pain", 			not jps.myDebuff("shadow word: pain","target") or swpDuration < 1 },
 		{ "shadow word: death", 		},
-		{ "vampiric touch", 			not jps.myDebuff("vampiric touch","target") or vtDuration < 2 and (not jps.LastCast=="Vampiric Touch") },
+		{ "vampiric touch", 			not jps.debuff("vampiric touch") and  (jps.LastCast ~= ("vampiric touch")) },
 		{ "devouring plague", 			sorbs == 3 },
-		{ "Halo",						jps.UseCDs },
+		{ "Halo",						}, -- jps.UseCDs 
 		{ "mind spike",					jps.buff("surge of darkness") },
 		{ "shadowfiend", 				jps.UseCDs },
 
