@@ -49,8 +49,8 @@ function druid_balance(self)
 		{ "Moonfire", 					lEclipse and focusMF < ngDuration, "focus" }, -- May need to add in cast time   so... (ngDuration - 2)
 		{ "Sunfire", 					sEclipse and focusSF < ngDuration, "focus" }, -- May need to add in cast time   so... (ngDuration - 2)
 		
-		--{ "Hurricane",					jps.MultiTarget and sEclipse and natG },
-		--{ "Hurricane",					jps.MultiTarget and sEclipse and (myMana > 25) },
+		{ "Hurricane",					jps.MultiTarget and sEclipse and natG },
+		{ "Hurricane",					jps.MultiTarget and sEclipse and (myMana > 25) },
 		{ "Starfall", 					jps.MultiTarget and targetHealthPercent > 90 },
 
 		{ "Moonfire",					mfDuration < 1.5 },

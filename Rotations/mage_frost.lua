@@ -29,9 +29,10 @@ function mage_frost(self)
 		
 	    -- interrupt?
 	    -- Lets just check one CD before we go thru everything
+	   -- { "Alter Time", 		 not jps.buff("Alter Time", "player")},
 	    { "Alter Time", 		 jps.UseCDs and froststacks >= 1 and jps.buff("Brain Freeze", "player") and not jps.buff("Alter Time", "player")},
 		{ "Counterspell",        jps.Interrupts and jps.shouldKick("target"), "target"  },
-		{ "Spellsteal",		     y==1 and jps.Interrupts								},
+		{ "Spellsteal",		     y==1 and jps.Interrupts 							},
 		{ "Presence of Mind",	 			 jps.UseCDs										  			 		},
 		-- { "Ice Barrier",      (UnitHealth("player") / UnitHealthMax("player") < 0.10)  and not jps.buff("Ice Barrier","player"), "player" },
 		

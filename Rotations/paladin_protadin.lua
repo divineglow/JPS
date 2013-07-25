@@ -24,7 +24,10 @@ function paladin_protadin(self)
        { "Word of Glory", 				   IsAltKeyDown() ~= nil }, 
       -- { "Cleanse", 					  jps.Defensive },
        { "Shield of the Righteous",				 IsShiftKeyDown() ~= nil   },
-       { "Cleanse", 						    IsControlKeyDown() ~= nil },
+        { "Divine Protection",              IsShiftKeyDown() ~= nil and jps.LastCast ~= "Shield of the Righteous" },
+      -- { "Cleanse", 						    IsControlKeyDown() ~= nil },
+       { "Holy Avenger",                    jps.UseCDs				 },
+       
        
              -- Kicks
       { "Rebuke",                         jps.shouldKick() },
@@ -32,19 +35,19 @@ function paladin_protadin(self)
       { "Arcane Torrent",                 jps.shouldKick() and IsSpellInRange("Crusader Strike","target")==1 and jps.LastCast ~= "Rebuke" },
       { "Avenger's Shield",               jps.shouldKick() and ((jps.LastCast ~= "Rebuke") or (jps.LastCast ~= "Arcane Torrent")) },
       { "Hammer of Wrath",                },
-       
+        { "Shield of the Righteous",         hPower >= 5 },
        { "Hammer of the Righteous",       not jps.debuff("Weakened Blows", "target") or jps.MultiTarget }, 
        { "Crusader Strike",                },
        { "Avenger's Shield",               jps.buff("Grand Crusader") },
-        { "Judgment",                       },
-         { "Avenger's Shield",             not jps.Interrupts  },   
+       { "Judgment",                       },
+       { "Avenger's Shield",              not jps.Interrupts  },   
        
       -- Defensive Cooldowns
      -- { "Lay on Hands",                   myHealthPercent < 10  }, --10 Minute CD
       --{ "Guardian of Ancient Kings",      myHealthPercent < 25  }, --3 Minute CD
       { "Ardent Defender",                myHealthPercent < 15  }, --3 Minute CD
      -- { "Seal of Insight",                (myHealthPercent < 50 or myManaPercent < 40 ) and nStance ~= 3 },
-      { "Divine Protection",              myHealthPercent < 60  }, --1 Minute CD
+      --1 Minute CD
 
       --Active Mitgations
       --{ "Word of Glory",                  myHealthPercent < 75 and jps.buff("Shield of the Righteous") },
@@ -58,10 +61,10 @@ function paladin_protadin(self)
       { "Righteous Fury",                 not jps.buff("Righteous Fury") },
      
      
-      { "Shield of the Righteous",         hPower >= 5 },
-      { "Sacred Shield",                   jps.Defensive				 },
+     
+      { "Sacred Shield",                   jps.Defensive and not jps.buff("Sacred Shield")				 },
       { "Hand of Purity",                  jps.Defensive			   	 },
-       { "Holy Avenger",                   jps.Defensive and jps.UseCDs				 },
+       
       --{ "Light's Hammer",                 IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
       
       -- CDs
@@ -69,17 +72,13 @@ function paladin_protadin(self)
      -- { "Avenging Wrath",                 jps.UseCDs },
       { jps.useTrinket(1),      		  jps.UseCDs },
       { jps.useTrinket(2),       		  jps.UseCDs },
-      { "Execution Sentence",             jps.UseCDs },    
+      { "Execution Sentence",             			 },    
       -- Damage
      
      
-      { "Consecration",                    IsSpellInRange("Crusader Strike","target")==1 }, 
+      { "Consecration",                   jps.MultiTarget and IsSpellInRange("Crusader Strike","target")==1 }, 
       
-     
-        
-      
-      
-     
+    
       { "Holy Wrath",                     },
 
       { {"macro","/startattack"}, nil, "target" },

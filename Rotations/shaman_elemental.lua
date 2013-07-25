@@ -40,7 +40,7 @@ function shaman_elemental(self)
       --Get some buffs
       { "lightning shield",         not jps.buff("lightning shield") },
       { "Flametongue Weapon",       not mh},
-      { "Healing Surge",            playerHealth < 40 },
+      { "Healing Surge",            playerHealth < 65 },
       
       --Totems
       { "searing totem",            not haveFireTotem },

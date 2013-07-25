@@ -13,8 +13,8 @@ function paladin_ret(self)
    {      
    
     -- Lets Check our Seal's
-   -- { "Seal of Truth",              not jps.MultiTarget and nStance ~= 1 },
-   -- { "Seal of Righteousness",      jps.MultiTarget and nStance ~= 2 },
+    { "Seal of Truth",              not jps.MultiTarget and nStance ~= 1 },
+    { "Seal of Righteousness",      jps.MultiTarget and nStance ~= 2 },
     
     -- Health Check for LoH and Sacred Shield
     { "Lay on Hands",               myHealthPercent < 15 },
