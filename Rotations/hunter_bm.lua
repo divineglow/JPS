@@ -5,12 +5,13 @@ if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then re
 
 local spell = nil
 local targetHealth = UnitHealth("target")/UnitHealthMax("target")
-local petHealth = UnitHealth("focus")/UnitHealthMax("focus")
+local petHealth = UnitHealth("pet")/UnitHealthMax("pet")
 local fStacks = jps.buffStacks("Frenzy","player")
 local sps_duration = jps.debuffDuration("serpent sting")
 local focus = UnitMana("player")
 local pet_focus = UnitMana("pet")
 local pet_attacking = IsPetAttackActive()
+
 
 -- Misdirecting to pet if not in a party
 if GetNumSubgroupMembers() == 0 and jps.Opening and not UnitIsDead("pet") then
@@ -37,8 +38,8 @@ local spellTable =
 	{ "aspect of the iron hawk", 	not jps.Moving and not jps.buff("aspect of the iron hawk") },
 	--{ "hunter's mark", 				(targetHealth > 80 and (targetHealth > 50 or UnitHealthMax("target") > 25000 )) not jps.debuff("hunter's mark") },
 	
-	{ "Explosive Trap",        		jps.MultiTarget and IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
-	{ "Snake Trap",        			IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
+	{ "Freezing Trap",        		IsShiftKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
+	{ "Snake Trap",        			IsControlKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil },
 
  	--Interrupts
     { "Silencing Shot",             jps.shouldKick("target") and jps.Interrupts and (jps.castTimeLeft("target") <= 0.5) , "target" },
@@ -51,13 +52,13 @@ local spellTable =
 	{ "Fervor", 					focus < 65 and not jps.buff("fervor") },
 	{ "Bestial Wrath", 				focus > 60 and not jps.buff("the beast within") },
 	
-	--{ "Mend Pet",					petHealth < 72 and not jps.buff("Mend Pet","pet") },
+	{ "Mend Pet",					petHealth < .60 and not jps.buff("Mend Pet","pet") },
 
 	{ "Multi-Shot", 				jps.MultiTarget },
 	{ "Cobra Shot", 				jps.MultiTarget },
 	
 	{ "Rapid Fire", 				jps.UseCDs and not jps.buff("The Beast Within") and not jps.bloodlusting() },
-	{ "Stampede", 					jps.UseCDs and (jps.buff("Rapid Fire") or jps.bloodlusting() or targetHealth < 35) },
+	{ "Stampede", 					jps.UseCDs and (jps.buff("Rapid Fire") or jps.bloodlusting() or targetHealth < .35) },
 	{ "kill shot", 					},
 	{ "kill command", 				},
 	{ "a murder of crows", 			jps.UseCDs },

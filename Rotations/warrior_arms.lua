@@ -21,12 +21,12 @@ function warrior_arms(self)
       { "Battle Shout" ,      not jps.buff("Battle Shout") and not jps.buff("Roar of Courage") and not jps.buff("Horn of Winter") and not jps.buff("Strength of earth totem") },
       { "Bloodbath",          jps.UseCDs and (jps.cd("Colossus Smash") < 2 or jps.debuffDuration("Colossus Smash") >= 5) and (IsSpellInRange("Pummel", "target") == 1) },
       { "Recklessness",       jps.UseCDs and jps.buff ("Bloodbath") and (targetHealth < 20 or targetHealth >= 35) and IsSpellInRange("Pummel", "target") == 1},
-    --  { "Avatar",           jps.UseCDs and IsSpellInRange("Pummel", "target") == 1 },
+      { "Avatar",           jps.UseCDs and IsSpellInRange("Pummel", "target") == 1 },
       { "Skull Banner",       jps.UseCDs and jps.buff("Recklessness","player") },
       { "Berserker Rage",     jps.UseCDs and not nRage and nPower <= 110 and (IsSpellInRange("Pummel", "target") == 1) },
-      --{ "Lifeblood",        IsSpellInRange("Pummel", "target") == 1},  --if I'm an Herbalist.  Otherwise, ignore me!!
-      { jps.useTrinket(1),    jps.UseCds },
-      { jps.useTrinket(2),    jps.UseCds },
+      { "Lifeblood",        IsSpellInRange("Pummel", "target") == 1},  --if I'm an Herbalist.  Otherwise, ignore me!!
+      { jps.useTrinket(1),    jps.UseCDs },
+      { jps.useTrinket(2),    jps.UseCDs },
 
     --Interrupts
       { "Pummel",             jps.shouldKick("target") and jps.Interrupts and (jps.castTimeLeft("target") <= .6) },

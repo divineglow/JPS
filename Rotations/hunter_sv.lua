@@ -4,6 +4,7 @@ if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then re
 
 local spell = nil
 local targetHealth = UnitHealth("target")/UnitHealthMax("target")
+local petHealth = UnitHealth("pet")/UnitHealthMax("pet")
 local fStacks = jps.buffStacks("Frenzy","player")
 local sps_duration = jps.debuffDuration("serpent sting")
 local focus = UnitMana("player")
@@ -56,6 +57,7 @@ local spellTable =
    { "Multi-Shot",               jps.MultiTarget },
    { "Cobra Shot",               jps.MultiTarget },
 
+   { "Mend Pet",                 petHealth < .60 and not jps.buff("Mend Pet","pet") },
    { "Serpent Sting",            not jps.myDebuff("serpent sting") },
    { "Explosive Shot"            },
    { "Kill Shot",                },
