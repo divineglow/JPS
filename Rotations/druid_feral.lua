@@ -21,7 +21,6 @@ function druid_feral(self)
 	if jps.MultiTarget then
 	    spellTable =
 		{
-<<<<<<< HEAD
 		    { "Cat Form",			not jps.buff("Cat Form") },
             -- approximate aoe range
             { "Skull bash",			jps.shouldKick() and jps.Interrupts and IsSpellInRange("skull bash","target") == 1 },
@@ -29,15 +28,6 @@ function druid_feral(self)
 			{ "tiger's fury", 		energy <= 35 and not clearcasting and gcdLocked },
 		    { "thrash",				jps.debuffDuration("thrash") < 2 },
 		    { "swipe",				energy > 51 },
-=======
-	    { "Cat Form",			not jps.buff("Cat Form") },
-            -- approximate aoe range
-            { "Skull bash",			jps.shouldKick() and jps.Interrupts and IsSpellInRange("skull bash","target") == 1 },
-            { "savage roar",		srDuration == 0 },
-	    { "tiger's fury", 		energy <= 35 and not clearcasting and gcdLocked },
-	    { "thrash",				jps.debuffDuration("thrash") < 2 },
-	    { "swipe",				energy > 51 },
->>>>>>> 9b3b3c80b077ee344cf4d2ab2ebbb5de1718f4b2
 		}
 	else
 		spellTable =

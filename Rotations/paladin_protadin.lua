@@ -18,36 +18,40 @@ function paladin_protadin(self)
    {    
       -- Check for Which Seal to use
        { "Seal of Truth",          	       not jps.MultiTarget and   nStance ~= 1 and stacks < 5 }, 
-      
+      --{ "Seal of Insight",                not jps.MultiTarget and jps.Defensive and nStance ~= 3 },
        { "Seal of Righteousness",          jps.MultiTarget  and nStance ~= 2 }, 
        { "Seal of Insight",                nStance ~= 3 and stacks == 5	and not jps.MultiTarget						 },
        { "Word of Glory", 				   IsAltKeyDown() ~= nil }, 
-    
+      -- { "Cleanse", 					  jps.Defensive },
        { "Shield of the Righteous",				 IsShiftKeyDown() ~= nil   },
-       { "Divine Protection",              IsShiftKeyDown() ~= nil and jps.LastCast ~= "Shield of the Righteous" },
-     
+        { "Divine Protection",              IsShiftKeyDown() ~= nil and jps.LastCast ~= "Shield of the Righteous" },
+      -- { "Cleanse", 						    IsControlKeyDown() ~= nil },
        { "Holy Avenger",                    jps.UseCDs				 },
        
        
-             -- Interupts
+             -- Kicks
       { "Rebuke",                         jps.shouldKick() },
       { "Rebuke",                         jps.shouldKick("focus"), "focus" },
       { "Arcane Torrent",                 jps.shouldKick() and IsSpellInRange("Crusader Strike","target")==1 and jps.LastCast ~= "Rebuke" },
       { "Avenger's Shield",               jps.shouldKick() and ((jps.LastCast ~= "Rebuke") or (jps.LastCast ~= "Arcane Torrent")) },
       { "Hammer of Wrath",                },
-      { "Shield of the Righteous",         hPower >= 5 },
-      { "Hammer of the Righteous",       not jps.debuff("Weakened Blows", "target") or jps.MultiTarget }, 
-      { "Crusader Strike",                },
-      { "Avenger's Shield",               jps.buff("Grand Crusader") },
-      { "Judgment",                       },
-      { "Avenger's Shield",              not jps.Interrupts  },   
+        { "Shield of the Righteous",         hPower >= 5 },
+       { "Hammer of the Righteous",       not jps.debuff("Weakened Blows", "target") or jps.MultiTarget }, 
+       { "Crusader Strike",                },
+       { "Avenger's Shield",               jps.buff("Grand Crusader") },
+       { "Judgment",                       },
+       { "Avenger's Shield",              not jps.Interrupts  },   
        
-      -- Defensive Cooldowns, uncomment these if you want to have Goblin do them for you! 
-       { "Ardent Defender",                myHealthPercent < 15  }, --3 Minute CD
-      -- { "Lay on Hands",                   myHealthPercent < 10  }, --10 Minute CD
-      -- { "Guardian of Ancient Kings",      myHealthPercent < 25  }, --3 Minute CD
-      -- { "Word of Glory",                  myHealthPercent < 75 and jps.buff("Shield of the Righteous") },
-      -- { "Word of Glory",                  myHealthPercent < 40 and Acharge >= 4  },
+      -- Defensive Cooldowns
+     -- { "Lay on Hands",                   myHealthPercent < 10  }, --10 Minute CD
+      --{ "Guardian of Ancient Kings",      myHealthPercent < 25  }, --3 Minute CD
+      { "Ardent Defender",                myHealthPercent < 15  }, --3 Minute CD
+     -- { "Seal of Insight",                (myHealthPercent < 50 or myManaPercent < 40 ) and nStance ~= 3 },
+      --1 Minute CD
+
+      --Active Mitgations
+      --{ "Word of Glory",                  myHealthPercent < 75 and jps.buff("Shield of the Righteous") },
+      --{ "Word of Glory",                  myHealthPercent < 40 and Acharge >= 4  },
       
      
 

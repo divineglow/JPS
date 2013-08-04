@@ -4,24 +4,34 @@ function rogue_assass(self)
 	local rupture_duration = jps.debuffDuration("rupture")
 	local snd_duration = jps.buffDuration("slice and dice")
 	local energy = UnitMana("player")
+	local thp = UnitHealth("target")/UnitHealthMax("target") * 100
 
 	local spellTable =
 	{
-		{ "preparation", not jps.buff("vanish") and jps.cd("vanish") > 60 },
-		{ "vanish", not jps.buff("stealth") and not jps.buff("shadow blades") },
-		{ "ambush" },
-		{ "shadow blades", jps.bloodlusting() and snd_duration >= jps.buffDuration("shadow blades") },
-		{ "slice and dice", snd_duration <= 2 },
-		{ "dispatch",	energy > 90 and rupture_duration < 4 },
-		{ "mutilate", 	energy > 90 and rupture_duration < 4 },
-		{ "rupture",	rupture_duration < 2 or (cp == 5 and rupture_duration < 3) },
-		{ "vendetta" },
-		{ "envenom", cp >= 4 and jps.buffDuration("envenom") < 1 },
-		{ "envenom", cp > 4 },
-		{ "envenom", cp >= 2 and snd_duration < 3 },
-		{ "dispatch", cp < 5 },
-		{ "tricks of the trade" },
-		{ "mutilate" },
+	
+		-- Use CD Checker
+		{ "Preperation",					jps.UseCDs },
+		{ "Vanish",							jps.UseCDs and not jps.buff("stealth")},
+		{ "Shadow Blades",					jps.UseCDs },
+		{ "Vendetta",						jps.UseCds },
+		
+		-- Finishing Moves 
+		{ "Slice and Dice", 				cp >= 2 and not jps.debuff("Slice and Dice", "target") },
+		{ "Envenom", 						snd_duration <= 3 }, 
+		{ "Rupture",						cp >= 5 },
+		{ "Envenom",						cp >= 4 },
+	
+		-- Multi target Check
+		{ "Crimson Tempest",				jps.MultiTarget and not jps.debuff("Crimson Tempest", "target")},
+		{ "Fan of Knives", 					jps.MultiTarget 											   },
+		
+		-- Combo Point Builders 
+		{ "Ambush" 								    						   },
+		{ "Dispatch",						thp <= 35 or jps.buff("Blindside") },
+		{ "Mutilate",						thp >= 36 						   },
+
+
+
 	}
 
 	return parseSpellTable( spellTable )

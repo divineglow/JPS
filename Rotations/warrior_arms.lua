@@ -1,5 +1,10 @@
 function warrior_arms(self)
 --Gocargo
+-- Modified by FuzzyHobo
+
+-- Shift: 	Heroic Leap
+-- Control:	Hamstring
+-- Alt:		Staggering Shout, Piercing Howl
 
    if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then return end
 
@@ -21,10 +26,10 @@ function warrior_arms(self)
       { "Battle Shout" ,      not jps.buff("Battle Shout") and not jps.buff("Roar of Courage") and not jps.buff("Horn of Winter") and not jps.buff("Strength of earth totem") },
       { "Bloodbath",          jps.UseCDs and (jps.cd("Colossus Smash") < 2 or jps.debuffDuration("Colossus Smash") >= 5) and (IsSpellInRange("Pummel", "target") == 1) },
       { "Recklessness",       jps.UseCDs and jps.buff ("Bloodbath") and (targetHealth < 20 or targetHealth >= 35) and IsSpellInRange("Pummel", "target") == 1},
-      { "Avatar",           jps.UseCDs and IsSpellInRange("Pummel", "target") == 1 },
+    --  { "Avatar",           jps.UseCDs and IsSpellInRange("Pummel", "target") == 1 },
       { "Skull Banner",       jps.UseCDs and jps.buff("Recklessness","player") },
       { "Berserker Rage",     jps.UseCDs and not nRage and nPower <= 110 and (IsSpellInRange("Pummel", "target") == 1) },
-      { "Lifeblood",        IsSpellInRange("Pummel", "target") == 1},  --if I'm an Herbalist.  Otherwise, ignore me!!
+      --{ "Lifeblood",        IsSpellInRange("Pummel", "target") == 1},  --if I'm an Herbalist.  Otherwise, ignore me!!
       { jps.useTrinket(1),    jps.UseCDs },
       { jps.useTrinket(2),    jps.UseCDs },
 
@@ -33,6 +38,11 @@ function warrior_arms(self)
       { "Disrupting Shout",   jps.shouldKick("target") and jps.Interrupts and (jps.LastCast ~= "Pummel") and (jps.castTimeLeft("target") <= .4) },
       { "Pummel",             jps.shouldKick("focus") and jps.Interrupts and (jps.castTimeLeft("focus") <= .6), "focus" },
       { "Disrupting Shout",   jps.shouldKick("focus") and jps.Interrupts and (jps.LastCast ~= "Pummel") and (jps.castTimeLeft("focus") <= .4), "focus" },
+	  
+	  -- User Intervention
+      { "Hamstring",          IsControlKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil }, -- Added by FuzzyHobo
+      { "Staggering Shout",   IsAltKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil }, 	-- Added by FuzzyHobo
+	  { "Piercing Howl",  	  IsAltKeyDown() ~= nil and GetCurrentKeyBoardFocus() == nil }, 	-- Added by FuzzyHobo
 
       --Multi Target
       { "Sweeping Strikes" ,  jps.MultiTarget and IsSpellInRange("Slam", "target") == 1 },

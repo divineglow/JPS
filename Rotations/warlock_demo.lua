@@ -12,43 +12,40 @@ if UnitCanAttack("player","target")~=1 or UnitIsDeadOrGhost("target")==1 then re
    local spellTable =
     
     {
+    
+    -- Cool Down Checking
+    { "Grimoire: Felguard", 			jps.UseCDs 														},
+    { "Summon Doomguard",				jps.UseCDs														},
+    
+    -- Key Press Checks
+    { "Harvest Life",      				IsShiftKeyDown() ~= nil and jps.MultiTarget						},
+    { "Summon Infernal",      			IsShiftKeyDown() ~= nil 										},
+    { "Life Tap",      					IsAltKeyDown() ~= nil 											},
+    
+    -- Metamorphosis Phase
+    { {"macro","/cast Metamorphosis"},	dpower <= 750 and jps.buff("Metamorphosis") 					}, -- Takes us back to Regular DPS roation
+    { "Metamorphosis",					dpower >= 900 and not jps.buff("Metamorphosis") 				},
+    { "Doom",							jps.buff("Metamorphosis") and not jps.debuff("Doom", "target")  },
+    { "Soul Fire", 						jps.buff("Molten Core")										   	},
+    { "Touch of Chaos",					cpn_duration <= 3 and jps.buff("Metamorphosis")					},
+    { "Dark Soul: Knowledge",			jps.buff("Metamorphosis") 										},
+    { "Void Ray",						jps.MultiTarget and jps.buff("Metamorphosis") 					},
+    
+    -- Demonic Fury Builders
+    { "Corruption",						not jps.debuff("Corruption", "target")							},
+    { "Fel Flame", 						jps.Moving														},
+    { "Curse of the Elements",			not jps.debuff("Curse of the Elements", "target")				},  
+    { "Hand of Gul'dan",				not jps.debuff("Shadowflame", "target")							},
+    { "Shadow Bolt",					not jps.Moving													},
    
-   
-   { "curse of the elements", cur_duration == 0 },
-   { "fel flame", currentSpeed > 0 },
-   
-   { {"macro","/cast Dark Soul: Knowledge"}, jps.cooldown("Dark Soul: Knowledge") == 0 and jps.UseCDs and jps.Opening },
-   { {"macro","/cast Dark Soul: Knowledge"}, jps.cooldown("Dark Soul: Knowledge") == 0 and jps.UseCDs and dpower > 780 },
-   { "hand of gul'dan" },
-   { {"macro","/use 10"}, jps.glovesCooldown() == 0 and jps.UseCDs },
-   { jps.DPSRacial, jps.UseCDs },
-   
-   { "corruption", cpn_duration == 0 },
-   
-   { "imp swarm", jps.UseCDs },
-   { {"macro","/cast felstorm"}, jps.cooldown("felstorm") == 0 },
-   { {"macro","/cast Grimoire: Felguard"}, jps.cooldown("Grimoire: Felguard") == 0 and not jps.buff("metamorphosis") and jps.UseCDs },
-   
-   ----- meta pull -----
-   { "metamorphosis", jps.Opening },
-   
-   ---meta cycle ----
-   { "metamorphosis", dpower > 800 },
-   
-   { {"macro","/cast doom"}, jps.buff("metamorphosis") and jps.buffDuration("doom") <= 30 },
-   { {"macro","/cast touch of chaos"}, jps.buff("metamorphosis") },
-   
-   
-   -- forme humaine --
-   
-   { "soul fire", jps.buff("molten core") and jps.buffDuration("molten core") > 2 and not jps.buff("metamorphosis") },
-   { "soul fire", jps.hp("target") <= 0.25 and not jps.buff("metamorphosis") },
-   { "shadow bolt", not jps.buff("metamorphosis") },
-   
+      
    
    }
    
-   if jps.buff("metamorphosis") then jps.Opening = false end
+      if spell == "Summon Infernal" or spell == "Insert Other Spell Here" then
+       jps.Cast( spell )
+       jps.groundClick()
+   end
    
      local spell = parseSpellTable( spellTable )
       return spell

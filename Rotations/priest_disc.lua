@@ -1,9 +1,7 @@
-function priest_disc(self)
-	-- INFO --
-	-- Shift-key to cast Tree of Life
-	-- jps.MultiTarget to Wild Regrowth
-	-- Use Innervate and Tranquility manually
+-- Discipline Priest healing
+--   by FuzzyHobo
 
+function priest_disc(self)
 	--healer
 	local playerMana = UnitMana("player") / UnitManaMax("player") * 100
 	local tank = nil
@@ -26,11 +24,7 @@ function priest_disc(self)
 	local defaultHP = jps.hpInc(defaultTarget)
 
 	local spellTable =
-	{
-		-- Buffs
-		{ "Inner Fire",             not jps.buff("Inner Fire", me), me },
-		{ "Power Word: Fortitude",  not jps.buff("Power Word: Fortitude", me) or not jps.buff("Power Word: Fortitude", tank), me }, -- Rebuff if tank is missing buff
-		
+	{		
 		-- AOE heal, use every CD
 		{ "Cascade",              	jps.MultiTarget and defaultHP <= 0.90, defaultTarget },
 		
@@ -41,8 +35,8 @@ function priest_disc(self)
 		{ "Pain Suppression",      	jps.UseCDs and jps.hpInc(me) <= 0.25, me },
 		
 		-- Mana recovery
-		{ "Mindbender",            	jps.UseCDs and playerMana <= 60 }, -- TODO: Requires an enemy target
-		{ "Shadowfiend",           	jps.UseCDs and playerMana <= 60 }, -- TODO: Requires an enemy target
+		{ "Mindbender",            	jps.UseCDs and playerMana <= 60 and UnitCanAttack("player","target") == 1 and UnitIsDeadOrGhost("target") == 0 }, -- TODO: Requires an enemy target
+		{ "Shadowfiend",           	jps.UseCDs and playerMana <= 60 and UnitCanAttack("player","target") == 1 and UnitIsDeadOrGhost("target") == 0 }, -- TODO: Requires an enemy target
 		{ "Hymn of Hope",          	jps.UseCDs and playerMana <= 40 },
 		
 		-- Cooldowns
@@ -59,13 +53,14 @@ function priest_disc(self)
 		{ "Penance",              	defaultHP <= 0.40, defaultTarget },
 		{ "Power Word: Shield",     not jps.buff("Power Word: Shield", defaultTarget) and not jps.debuff("Weakened Soul", defaultTarget) and defaultHP <= 0.90, defaultTarget },
 		{ "Prayer of Mending",      jps.hpInc(tank) <= 0.90, tank },
+		-- { "Binding Heal",           not jps.Moving and jps.hp() <= 0.50 and defaultHP <= 0.50 and defaultTarget ~= me, defaultTarget },
 		{ "Flash Heal",             not jps.Moving and jps.hpInc(tank) <= 0.40, tank },
 		{ "Flash Heal",             not jps.Moving and defaultHP <= 0.50 and defaultTarget ~= tank, defaultTarget },
 		{ "Greater Heal",           tank ~= nil and not jps.Moving and jps.hpInc(tank) <= 0.60, tank },
 		{ "Renew",  				playerMana > 10 and not jps.buff("Renew", defaultTarget) and defaultHP <= 0.90, defaultTarget },
 		
 		-- Spamming mana recovery
-		{ "Power Word: Solace", 	playerMana <= 99 }, -- TODO: Requires an enemy target
+		{ "Power Word: Solace", 	playerMana <= 99 and UnitCanAttack("player","target") == 1 and UnitIsDeadOrGhost("target") == 0 }, -- TODO: Requires an enemy target
 		
 		-- Dispell
 		{ "Purify",                 cleanseTarget~=nil, cleanseTarget },
@@ -73,7 +68,12 @@ function priest_disc(self)
 		-- Filler spam heal
 		{ "Heal",                   not jps.Moving and jps.hpInc(tank) <= 0.85, tank },
 		{ "Heal",                   not jps.Moving and jps.hpInc(defaultTarget) <= 0.70, defaultTarget },
-		
+	
+
+		-- Buffs
+		{ "Inner Fire",             playerMana >= 50 and not jps.buff("Inner Fire", me), me },
+		{ "Inner Will",             playerMana < 50 and not jps.buff("Inner Will", me), me },
+		{ "Power Word: Fortitude",  not jps.buff("Power Word: Fortitude", me) or not jps.buff("Power Word: Fortitude", tank), me }, -- Rebuff if tank is missing buff	
 	}
 
 	local spell,target = parseSpellTable(spellTable)

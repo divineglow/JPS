@@ -15,7 +15,7 @@ function rogue_sub(self)
 		{ "vanish", energy >= 45 and energy <= 75 and cp <= 3 and not jps.buff("Shadow Dance") and not jps.buff("Master of Subtlety") and not jps.debuff("find weakness") },
 		{ "premeditation", cp <= 2 },
 		{ "ambush", cp <= 5 },
-		{ "slice and dice", snd_duration < 3 and cp == 5 },
+		{ "slice and dice", snd_duration <= 3 and cp == 5 },
 		{ "rupture", rupture_duration < 5 and cp == 5 },
 		{ "ambush", jps.buffDuration("shadow dance") <= 2 },
 		{ "eviscerate", cp == 5 },

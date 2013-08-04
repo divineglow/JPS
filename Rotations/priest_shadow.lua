@@ -38,4 +38,3 @@ function priest_shadow(self)
 end
 
 
--- Here is the auto rotation that I wrote. 

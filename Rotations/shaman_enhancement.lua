@@ -1,53 +1,44 @@
 function shaman_enhancement(self)
-  --simcraft and more
-  -- Talents:
-  -- Tier 1: Astral Shift
-  -- Tier 2: Windwalk Totem
-  -- Tier 3: Call of the Elements
-  -- Tier 4: Echo of the Elements
-  -- Tier 5: Ancestral Guidance
-  -- Tier 6: Unleashed Fury
-  -- Major Glyphs: Glyph of Chain Lightning, Glyph of Flame Shock
+	-- vipersnake
+    --jpganis +simcraft
+    local maelstromStacks = jps.buffStacks("maelstrom weapon")
+    local shockCD = jps.cd("earth shock")
+    local chainCD = jps.cd("chain lightning")
 
-  -- Usage info:
-  -- Use CDs for trinkets, Feral Spirit and Fire Elemental Totem
-  -- Use AoE for Magma Totem, Fire Nova and Chain Lightning on Maelstrom Stacks
-  -- Searing and Magma Totem will not override Fire Elemental Totem
+    -- Totems
+    local _, fireName, _, _, _ = GetTotemInfo(1)
+    local _, earthName, _, _, _ = GetTotemInfo(2)
+    local _, waterName, _, _, _ = GetTotemInfo(3)
+    local _, airName, _, _, _ = GetTotemInfo(4)
 
-  -- Todo:
-  -- Perhaps implement more survivability for soloing
-	local swpDuration = jps.debuffDuration("shadow word: pain")
-	local vtDuration = jps.debuffDuration("vampiric touch")
-	local targetHealth = UnitHealth("target")/UnitHealthMax("target")*100
-	local sorbs = UnitPower("player",13)
+    local mh, _, _, oh, _, _, _, _, _ =GetWeaponEnchantInfo()
 
-	local spellTable = {
-		{ "shadowform",					not jps.buff("shadowform") },
-		{ "inner fire",					not jps.buff("inner fire") },
+    local haveFireTotem = fireName ~= ""
+    local haveEarthTotem = earthName ~= ""
+    local haveWaterTotem = waterName ~= ""
+    local haveAirTotem = airName ~= ""
 
-		{ "renew", 						jps.hp("player") <= 0.20 and not jps.buff("Renew"), "player" },
-		{ "Mind Sear",					IsShiftKeyDown() == 1 },
+    local spellTable =
+    {
+        { "fire elemental totem", jps.UseCDs },
+        { "wind shear", jps.shouldKick("target") },
+        { "wind shear", jps.shouldKick("focus"), "focus" },
+        { "Windfury Weapon",         not mh},
+        { "Flametongue Weapon",         not oh and mh},
+        { "searing totem", GetTotemTimeLeft(1) < 2 },
+        { "lightning shield", not jps.buff("lightning shield") },
+        { "Stormstrike", "onCD"},
+        { "lava lash", "onCD"},
+        { "unleash elements", "onCD"},
+        { "flame shock", not jps.myDebuff("flame shock") or jps.buff("unleash flame") },
+        { "lightning bolt", maelstromStacks > 4 and (not jps.MultiTarget or chainCD > 0)},
+        { "chain lightning", maelstromStacks > 4 and jps.MultiTarget and chainCD == 0},
+        { "earth shock" },
+        { "feral spirit" },
+        --{ "earth elemental totem" }, 
+        { "spiritwalker's grace", jps.Moving },
+        { "lightning bolt", maelstromStacks > 4 and "onCD"},
+    }
 
-		{ "shadow word: death", 		jps.Moving },
-		{ "mind blast",					jps.buff("Divine Insight") and jps.Moving },
-		{ "Shadow Word: Pain", 			jps.Moving },
-
-		{ "devouring plague", 			sorbs == 3 and (jps.cooldown("Mind Blast") < 2 or targetHealth < 20) },
-		{ "mind blast",					},
-		{ "shadow word: pain", 			not jps.myDebuff("shadow word: pain","target") or swpDuration < 1 },
-		{ "shadow word: death", 		},
-		{ "vampiric touch", 			not jps.myDebuff("vampiric touch","target") or vtDuration < 2 and (not jps.LastCast=="Vampiric Touch") },
-		{ "devouring plague", 			sorbs == 3 },
-		{ "Halo",						jps.UseCDs },
-		{ "mind spike",					jps.buff("surge of darkness") },
-		{ "shadowfiend", 				jps.UseCDs },
-
-
-
-		{ "Mind Flay",					},
-
-		{ {"macro","/cast mind flay"}, 	jps.cooldown("mind flay") == 0 and not jps.Casting }
-	}
-
-	return parseSpellTable( spellTable )
+    return parseSpellTable( spellTable )
 end
