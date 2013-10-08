@@ -30,8 +30,6 @@ function warrior_arms(self)
       { "Skull Banner",       jps.UseCDs and jps.buff("Recklessness","player") },
       { "Berserker Rage",     jps.UseCDs and not nRage and nPower <= 110 and (IsSpellInRange("Pummel", "target") == 1) },
       --{ "Lifeblood",        IsSpellInRange("Pummel", "target") == 1},  --if I'm an Herbalist.  Otherwise, ignore me!!
-      { jps.useTrinket(1),    jps.UseCDs },
-      { jps.useTrinket(2),    jps.UseCDs },
 
     --Interrupts
       { "Pummel",             jps.shouldKick("target") and jps.Interrupts and (jps.castTimeLeft("target") <= .6) },
